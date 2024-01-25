@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "algolabra-shakki"
+version = "0.1.0"
+description = ""
+authors = ["volepp <oliverleppanen@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+berserk = "^0.13.2"
+chess = "^1.10.0"
+python-dotenv = "^1.0.1"
+numpy = "^1.26.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
