@@ -1,27 +1,23 @@
 from dotenv import load_dotenv
 import os
 import argparse
-import ui
-from game import Game
+from game import *
 from board import Board
 import engine
 import random
 
 # Enable loading secrets from secret/.env (e.g. LICHESS_TOKEN)
-dotenv_path = os.path.join(os.path.dirname(__file__), "/secret/.env")
-load_dotenv(dotenv_path)
+load_dotenv("secret/.env")
 
 def run(args):
-    ui_client = ui.Ascii()
-    player_starts = True # Player always plays white for now
-    lichess_token = args.token if args.token is not None else os.getenv("LICHESS_TOKEN")
-    if lichess_token is not None and args.lichess:
-        ui_client = ui.Lichess(lichess_token)
-        # TODO: set player_starts
-
     eng = engine.RandomEngine() # For now using RandomEngine for testing
 
-    Game(ui_client=ui_client, engine=eng, player_starts=player_starts).run()
+    game = AsciiGame(engine=eng)
+    lichess_token = args.token if args.token else os.getenv("LICHESS_TOKEN")
+    if lichess_token is not None and args.lichess:
+        game = LichessGame(lichess_token, eng)
+
+    game.run()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

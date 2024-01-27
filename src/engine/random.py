@@ -1,15 +1,16 @@
 import chess
+from engine import Engine
 from board import Board
 import random
 
 # Only used for initial UI testing
-class RandomEngine:
+class RandomEngine(Engine):
 
     def __init__(self):
         self.cheat_board = chess.Board()
 
     def make_move(self, board: Board):
-        """Makes the next move and returns it in SAN format.
+        """Makes the next move and returns it in UCI format.
         """
 
         last_move = board.get_last_move()

@@ -7,6 +7,6 @@ class Engine:
         pass
 
     def make_move(self, board):
-        """Makes the next move and returns it in SAN format.
+        """Makes the next move and returns it in UCI format.
         """
         return None
