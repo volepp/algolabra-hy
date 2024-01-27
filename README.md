@@ -1,5 +1,8 @@
 # Algolabra - Shakki
 
+[![codecov](https://codecov.io/gh/volepp/algolabra-shakki/graph/badge.svg?token=R4000SVQ04)](https://codecov.io/gh/volepp/algolabra-shakki)
+![CI](https://github.com/volepp/algolabra-shakki/workflows/CI/badge.svg)
+
 Helsingin Yliopiston kurssia *Aineopintojen harjoitustyö: Algoritmit ja tekoäly* varten tehty shakkipeli ja ihmistä vastaan pelaava tekoälyohjelma.
 
 ## Dokumentaatio
