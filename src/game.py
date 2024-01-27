@@ -19,6 +19,7 @@ class Game:
             self.board.update(engine_move)
 
         while True:
+            print(engine_move)
             player_move = self.ui_client.update(engine_move)
             self.board.update(player_move)
             if self.board.is_over():

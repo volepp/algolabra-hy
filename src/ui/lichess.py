@@ -10,7 +10,7 @@ class Lichess:
     def start(self):
         self.wait_for_challenge()
     
-    def update(self, move):
+    def update(self, move: str):
         """Updates the given move to the UI if the move is not None.
         Then waits for the user to make a move and returns it.
         Returns None if the player resigns.
@@ -19,7 +19,6 @@ class Lichess:
         if self.game_id is None:
            return None
         
-        print(move)
         if move is not None:
             self.client.bots.make_move(self.game_id, move)
         
@@ -29,6 +28,9 @@ class Lichess:
             return None
         
         return None
+    
+    def wait_for_player_move(self):
+        pass
 
     def wait_for_challenge(self):
         for event in self.client.bots.stream_incoming_events():

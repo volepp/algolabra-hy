@@ -16,12 +16,12 @@ class Ascii:
         """
 
         if move is not None:
-            self.board.push_san(move)
+            self.board.push_uci(move)
             self.render()
-        next_move = input()
+        next_move = input("Move UCI: ")
         if len(next_move) == 0:
             return None
-        self.board.push_san(next_move)
+        self.board.push_uci(next_move)
         self.render()
         return next_move
 
