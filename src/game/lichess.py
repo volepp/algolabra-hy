@@ -48,7 +48,7 @@ class LichessGame(Game):
         
         # Get player move
         self.board.update_moves(gs["moves"])
-        if self.board.next_turn_color() == self.color:
+        if self.board.next_move_color() == self.color:
             self.make_engine_move()
     
     def make_engine_move(self):
