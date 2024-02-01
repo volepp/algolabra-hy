@@ -1,6 +1,7 @@
 from game import Game
 import chess
 from engine import *
+from board.piece import Move, Color
 import os
 
 class AsciiGame(Game):
@@ -30,20 +31,31 @@ class AsciiGame(Game):
                 break
 
 
-    def update(self, move: str):
+    def update(self, move: Move|str):
         """Updates the given move to the UI and renders.
         Assumes the move not to be None.
         """
+        if type(move) is str:
+            move = Move.parse_uci(move)
         self.board.make_move(move)
-        self.visual_board.push_uci(move)
         self.render()
 
     def render(self):
         os.system("clear")
+        self.visual_board.set_board_fen(self.board.board_fen())
         print(self.visual_board)
+        print("Legal moves (W): ", self.board.get_legal_moves(Color.White))
+        print("Legal moves (B): ", self.board.get_legal_moves(Color.Black))
 
     def get_player_move(self):
-        next_move = input("Move UCI: ")
-        if len(next_move) == 0:
-            return None
-        return next_move
+        while True:
+            next_move = input("Move UCI: ")
+            if len(next_move) == 0:
+                return None
+            try:
+                # Check move validity
+                chess.Move.from_uci(next_move)
+                return next_move
+            except chess.InvalidMoveError:
+                print("Invalid move!")
+                continue

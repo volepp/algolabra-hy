@@ -1,7 +1,7 @@
 from game import Game
 import berserk
 from engine import *
-from board import Color
+from board.piece import Color
 
 class LichessGame(Game):
 
