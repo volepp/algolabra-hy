@@ -15,6 +15,8 @@ Helsingin Yliopiston kurssia *Aineopintojen harjoitustyö: Algoritmit ja tekoäl
 
 [Viikko 2](documentation/viikkoraportit/viikko2.md)
 
+[Viikko 3](documentation/viikkoraportit/viikko3.md)
+
 # Pelaaminen
 
 Ohjelmaa vastaan voi pelata joko komentorivillä ASCII-käyttöliittymää käyttäen tai Lichessissä yhdistämällä ohjelman bottikäyttäjään, jonka siirrot se tekee. 
