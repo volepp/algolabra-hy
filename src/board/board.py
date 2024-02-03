@@ -102,6 +102,8 @@ class Board:
         last_move = self.moves[-1]
         reverse_move = Move(last_move.to_square, last_move.from_square)
         self._make_move(reverse_move)
+        moved_piece = self.position[tuple(last_move.from_square)]
+        moved_piece.nr_moves -= 2 # Remove the original and reverse moves
         # Remove the two previous moves (reverse and original move)
         self.moves = self.moves[:-2]
         removed_move_index = len(self.moves)
@@ -151,10 +153,13 @@ class Board:
         moved_piece = self.position[tuple(move.from_square)]
         if moved_piece is None:
             # No piece in specified square
+            print("No piece in specified square")
             return False
         
         controlled_squares = np.array(moved_piece.get_controlled_squares())
+        print(controlled_squares)
         if move.to_square.tolist() not in controlled_squares.tolist():
+            print("not a controlled square")
             return False
             
         return self._is_move_legal(move)

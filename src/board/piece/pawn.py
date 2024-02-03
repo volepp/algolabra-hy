@@ -12,7 +12,7 @@ class Pawn(Piece):
         self.controlled_squares = self.get_advances(board)
         self.controlled_squares.extend(self.get_captures(board))    
 
-    def get_advances(self, board: np.array) -> [Move]:
+    def get_advances(self, board: np.array) -> [np.array]:
         possible_squares = []
         # If white, move up the board, down otherwise
         direction = 1 if self.color == Color.White else -1
