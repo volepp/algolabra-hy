@@ -8,7 +8,7 @@ Tämänhetkinen testikattavuus: [![codecov](https://codecov.io/gh/volepp/algolab
 
 ## Testien kuvaus
 
-Projektissa testataan ainoastaan pelilogiikaan ja tekoälyyn liittyviä moduuleita eli käytännössä kaikkea `board`` ja `engine`` moduuleihin sisältyvää. Lichess- ja Ascii-käyttöliittymiä, jotka ovat toteutettu pitkälti kolmannen osapuolen kirjastoja käyttäen, ei siis testata. 
+Projektissa testataan ainoastaan pelilogiikaan ja tekoälyyn liittyviä moduuleita eli käytännössä kaikkea `board` ja `engine` moduuleihin sisältyvää. Lichess- ja Ascii-käyttöliittymiä, jotka ovat toteutettu pitkälti kolmannen osapuolen kirjastoja käyttäen, ei siis testata. 
 
 Testit ajetaan CI:ssä automaattisesti ja testeistä generoidaan kattavuusraportti, joka ladataan Codecoviin. Tämän avulla Codecovista saadaan tietoa testikattavuudesta esimerkiksi README:n alkuun ja tähän dokumenttiin.
 
