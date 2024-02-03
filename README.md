@@ -8,6 +8,7 @@ Helsingin Yliopiston kurssia *Aineopintojen harjoitustyö: Algoritmit ja tekoäl
 ## Dokumentaatio
 
 [Määrittelydokumentti](documentation/maarittelydokumentti.md)
+
 [Testausdokumentti](documentation/testausdokumentti.md)
 
 ## Viikkoraportit
