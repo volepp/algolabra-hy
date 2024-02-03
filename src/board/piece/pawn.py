@@ -19,8 +19,10 @@ class Pawn(Piece):
 
         sqr_1 = np.copy(self.square)
         sqr_1[0] += direction # Move 1 square
-        if self.is_on_board(sqr_1) and board[tuple(sqr_1)] is None:
-            possible_squares.append(sqr_1)
+        move_1_possible = self.is_on_board(sqr_1) and board[tuple(sqr_1)] is None
+        if not move_1_possible:
+            return possible_squares # moving 2 squares cannot be possible either in this case
+        possible_squares.append(sqr_1)
 
         if self.nr_moves > 0:
             return possible_squares
