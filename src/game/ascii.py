@@ -22,12 +22,12 @@ class AsciiGame(Game):
         while True:
             player_move = self.get_player_move()
             self.update(player_move)
-            if self.board.is_over():
+            if self.board.is_game_over():
                 break
 
             engine_move = self.engine.make_move(self.board)
             self.update(engine_move)
-            if self.board.is_over():
+            if self.board.is_game_over():
                 break
 
 
@@ -37,7 +37,7 @@ class AsciiGame(Game):
         """
         if type(move) is str:
             move = Move.parse_uci(move)
-        self.board.make_move(move)
+        self.board.play_move(move)
         self.render()
 
     def render(self):

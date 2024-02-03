@@ -63,3 +63,10 @@ class Move:
     
     def __str__(self):
         return self.to_uci()
+    
+    def __eq__(self, other):
+        if not np.array_equal(self.from_square, other.from_square):
+            return False
+        elif not np.array_equal(self.to_square, other.to_square):
+            return False
+        return True

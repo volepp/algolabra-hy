@@ -12,6 +12,7 @@ class Piece:
         self.square = square
         self.color = color
         self.nr_moves = 0
+        self.controlled_squares = []
 
     def move(self, move: Move):
         self.nr_moves += 1
@@ -21,10 +22,16 @@ class Piece:
         self.nr_moves -= 1
         self.square = move.from_square
 
-    def get_possible_moves(self, board: np.array) -> [Move]:
-        """ Finds and returns the legal moves for this piece on the given board.
+    def calculate_controlled_squares(self, board: np.array):
+        """ Finds the squares the piece controls in the given position
+        and stores them in self.controlled_squares
         """
         pass
+
+    def get_controlled_squares(self) -> [Move]:
+        """ Returns the possible moves for this piece in the given position.
+        """
+        return self.controlled_squares
 
     def is_on_board(self, square: np.array):
         if square[0] < 0 or square[0] >= 8:
@@ -33,35 +40,30 @@ class Piece:
             return False
         return True
     
-    def get_move(self, to_square: np.array) -> Move:
-        return Move(self.square, to_square)
-    
-    def can_move_to(self, board: np.array, square: np.array):
-        if not self.is_on_board(square):
+    def has_piece(self, board: np.array, square: np.array):
+        if board[tuple(square)] is None:
             return False
-        piece_on_sqr = board[tuple(square)]
-        if piece_on_sqr is None or\
-            piece_on_sqr.color != self.color:
-            return True
-        return False
+        return True
     
-    def find_linear_moves(self, board: np.array, direction: tuple) -> [Move]:
-        """ Finds moves linearly following the specified direction until
+    def find_linear_squares(self, board: np.array, direction: tuple) -> [Move]:
+        """ Finds squares linearly following the specified direction until
         out of board or blocked by another piece that cannot be captured.
         """
-        moves = []
+        squares = []
         (nr_ranks, _) = board.shape
         for i in range(1, nr_ranks+1):
             # Move i steps to current direction
             movement = (direction[0]*i, direction[1]*i)
             resulting_square = self.square + movement
-            if self.can_move_to(board, resulting_square):
-                moves.append(Move(self.square, resulting_square))
-            else:
-                # Cannot move further if out of board or piece blocking the way
+            if not self.is_on_board(resulting_square):
                 break
+            if self.has_piece(board, resulting_square):
+                # Still controls the square, but doesn't see further
+                squares.append(resulting_square)
+                break
+            squares.append(resulting_square)
 
-        return moves
+        return squares
 
     def __repr__(self):
         color_str = "(W)"
@@ -71,3 +73,13 @@ class Piece:
     
     def fen_symbol(self):
         pass
+
+    def __eq__(self, other) -> bool:
+        if type(self) != type(other):
+            return False
+        
+        if self.color != other.color:
+            return False
+        
+        # Position doesn't matter
+        return True
