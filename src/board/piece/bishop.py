@@ -4,7 +4,7 @@ import numpy as np
 class Bishop(Piece):
 
     def __init__(self, square: np.array, color: Color):
-        super().__init__(square, color)
+        super().__init__(square, color, 3)
 
     def calculate_controlled_squares(self, board: np.array):
         self.controlled_squares = []

@@ -4,7 +4,7 @@ import numpy as np
 class Pawn(Piece):
 
     def __init__(self, square: np.array, color: Color):
-        super().__init__(square, color)
+        super().__init__(square, color, 1)
 
     def calculate_controlled_squares(self, board: np.array):
         # TODO think this through because technically the pawn doesn't

@@ -68,7 +68,8 @@ class TestBoard(unittest.TestCase):
 
     def test_is_check(self):
         # Shouldn't be check in the beginning
-        self.assertIsNone(self.board.color_in_check())
+        self.assertFalse(self.board.position.is_color_in_check(Color.White))
+        self.assertFalse(self.board.position.is_color_in_check(Color.Black))
 
     def test_is_over(self):
         # Shouldn't be over when just started

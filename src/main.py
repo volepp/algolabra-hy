@@ -10,7 +10,8 @@ import random
 load_dotenv("secret/.env")
 
 def run(args):
-    eng = engine.RandomEngine() # For now using RandomEngine for testing
+    #eng = engine.RandomEngine() # For now using RandomEngine for testing
+    eng = engine.Engine()
 
     game = AsciiGame(engine=eng)
     lichess_token = args.token if args.token else os.getenv("LICHESS_TOKEN")

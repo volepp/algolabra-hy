@@ -1,6 +1,7 @@
 from game import Game
 import chess
 from engine import *
+from board import Result
 from board.piece import Move, Color
 import os
 
@@ -21,24 +22,25 @@ class AsciiGame(Game):
 
         while True:
             player_move = self.get_player_move()
-            self.update(player_move)
-            if self.board.is_game_over():
+            result = self.update(player_move)
+            if result != None:
                 break
 
             engine_move = self.engine.make_move(self.board)
-            self.update(engine_move)
-            if self.board.is_game_over():
+            result = self.update(engine_move)
+            if result != None:
                 break
 
 
-    def update(self, move: Move|str):
+    def update(self, move: Move|str) -> Result:
         """Updates the given move to the UI and renders.
         Assumes the move not to be None.
         """
         if type(move) is str:
             move = Move.parse_uci(move)
-        self.board.play_move(move)
+        result = self.board.play_move(move)
         self.render()
+        return result
 
     def render(self):
         os.system("clear")

@@ -4,7 +4,7 @@ from .move import Move
 
 class Piece:
 
-    def __init__(self, square: np.array, color: Color):
+    def __init__(self, square: np.array, color: Color, value: int):
         """ Initializes the piece on the given square.
         The square parameter is a np array in the format [file, rank] so that
         a=1, b=2, c=3, ..., h=8, meaning [1,3] => a3, [5, 1] => e1 etc.
@@ -13,6 +13,7 @@ class Piece:
         self.color = color
         self.nr_moves = 0
         self.controlled_squares = []
+        self.value = value
 
     def move(self, move: Move):
         self.nr_moves += 1

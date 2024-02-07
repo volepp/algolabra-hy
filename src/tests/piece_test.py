@@ -10,12 +10,12 @@ class TestPieces(unittest.TestCase):
 
     def test_king_controlled_squares(self):
         # Kings should control 5 squares when game starts
-        self.assertEqual(len(self.board.white_king.get_controlled_squares()), 5)
-        self.assertEqual(len(self.board.black_king.get_controlled_squares()), 5)
+        self.assertEqual(len(self.board.position.white_king.get_controlled_squares()), 5)
+        self.assertEqual(len(self.board.position.black_king.get_controlled_squares()), 5)
 
         self.board.load_board_fen("8/8/3k4/8/3K4/8/8/8") # Position with only both kings in the middle of the board
-        self.assertEqual(len(self.board.white_king.get_controlled_squares()), 8)
-        self.assertEqual(len(self.board.black_king.get_controlled_squares()), 8)
+        self.assertEqual(len(self.board.position.white_king.get_controlled_squares()), 8)
+        self.assertEqual(len(self.board.position.black_king.get_controlled_squares()), 8)
 
     def test_knight_controlled_squares(self):
         white_knight_1 = self.board.position[0, 1]
@@ -78,7 +78,7 @@ class TestPieces(unittest.TestCase):
         self.assertEqual(len(br.get_controlled_squares()), 11)
 
     def test_pawn_controlled_squares(self):
-        for (_, _), piece in np.ndenumerate(self.board.position):
+        for (_, _), piece in np.ndenumerate(self.board.position.position):
             if type(piece) == Pawn:
                 # TODO: Currently considers the squares in front of the pawn controlled as well which will have to be fixed
                 self.assertEqual(len(piece.get_controlled_squares()), 2)
