@@ -1,6 +1,7 @@
 from board import Board, Result
 from board.piece import Move, Color
 import numpy as np
+import math
 import time
 
 class Engine:
@@ -10,7 +11,7 @@ class Engine:
 
     def __init__(self):
         # Max depth the minmax algorithm searches
-        self.max_depth = 1
+        self.max_depth = 2
         self.latest_evaluation = 0
 
     def make_move(self, board: Board) -> Move:
@@ -20,7 +21,7 @@ class Engine:
         self.latest_evaluation = eval
         return move
     
-    def find_best_move(self, board: Board) -> (Move, float):
+    def find_best_move(self, board: Board):
         """ Finds the best move in the position using a minmax algorithm.
         At each step, the position is evaluated using the evaluate_position function.
         In the end, the move that leads to the best position (according to evaluate_position)
@@ -34,7 +35,8 @@ class Engine:
         for move in legal_moves:
             print("Evaluating", move, end=" ")
             eval_start_time = time.time()
-            eval = self.minmax_eval_move(board, self.max_depth, move)
+            # self.max_depth-1 because this loop can be considered the first level
+            eval = self.minmax_ab_eval_move(board, self.max_depth-1, move)
             print(", eval:", eval, ", time:", time.time()-eval_start_time)
             if player_to_move == Color.White and eval > best_move_eval:
                 best_move_eval = eval
@@ -45,8 +47,8 @@ class Engine:
 
         return (best_move, best_move_eval)
     
-    def minmax_eval_move(self, board: Board, depth: int, move: Move):
-        """ Minmax algorithm that evaluates the given move by recursively going through the 
+    def minmax_ab_eval_move(self, board: Board, depth: int, move: Move, alpha: float = -math.inf, beta: float = math.inf):
+        """ Minmax algorithm with alpha-beta pruning that evaluates the given move by recursively going through the 
         possible variations that can follow with the given depth and evaluates the position at each step. 
         It will return the best possible evaluation it can find for the given player to move. 
         The evaluation should be interpreted such that the more positive the value is, 
@@ -61,15 +63,21 @@ class Engine:
         player_to_move = board.next_move_color()
         legal_moves = board.get_legal_moves(player_to_move)
         if player_to_move == Color.White:
-            best_eval = -1e9
+            best_eval = -math.inf
             for nmove in legal_moves:
-                best_eval = max(best_eval, self.minmax_eval_move(board, depth-1, nmove))
+                best_eval = max(best_eval, self.minmax_ab_eval_move(board, depth-1, nmove, alpha=alpha, beta=beta))
+                if best_eval > beta:
+                    break
+                alpha = max(alpha, best_eval)
             board.undo_last_move()
             return best_eval
         else:
-            best_eval = 1e9
+            best_eval = math.inf
             for nmove in legal_moves:
-                best_eval = max(best_eval, self.minmax_eval_move(board, depth-1, nmove))
+                best_eval = min(best_eval, self.minmax_ab_eval_move(board, depth-1, nmove, alpha=alpha, beta=beta))
+                if best_eval < alpha:
+                    break
+                beta = min(beta, best_eval)
             board.undo_last_move()
             return best_eval
 
