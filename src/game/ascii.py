@@ -22,12 +22,12 @@ class AsciiGame(Game):
 
         while True:
             player_move = self.get_player_move()
-            result = self.update(player_move)
+            result, _ = self.update(player_move)
             if result != None:
                 break
 
             engine_move = self.engine.make_move(self.board)
-            result = self.update(engine_move)
+            result, _ = self.update(engine_move)
             if result != None:
                 break
 

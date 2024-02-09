@@ -54,10 +54,11 @@ class Engine:
         The evaluation should be interpreted such that the more positive the value is, 
         the better the position is for white and viceversa.
         """
-        result = board.play_move(move)
+        result, move_played = board.play_move(move)
         if depth == 0 or result is not None:
             eval = self.evaluate_board(board)
-            board.undo_last_move()
+            if move_played:
+                board.undo_last_move()
             return eval
         
         player_to_move = board.next_move_color()
@@ -104,8 +105,8 @@ class Engine:
 
     def get_evaluation_from_result(self, result: Result) -> float:
         if result == Result.WHITE_WIN:
-            return 100
+            return math.inf
         elif result == Result.BLACK_WIN:
-            return -100
+            return -math.inf
         else: 
             return 0

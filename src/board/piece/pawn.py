@@ -6,6 +6,10 @@ class Pawn(Piece):
     def __init__(self, square: np.array, color: Color):
         super().__init__(square, color, 1)
 
+        # Assume that has moved if not on the second or 7th rank
+        if square is not None and square[0] != 1 and square[0] != 6:
+            self.nr_moves = 1
+
     def calculate_controlled_squares(self, board: np.array):
         # TODO think this through because technically the pawn doesn't
         # control the squares in front of it
@@ -40,17 +44,23 @@ class Pawn(Piece):
 
         capture_1 = np.copy(self.square)
         capture_1 += (direction, 1)
-        if self.is_on_board(capture_1) and \
-            board[tuple(capture_1)] is not None and \
-            board[tuple(capture_1)].color != self.color:
-            possible_squares = np.vstack((possible_squares, capture_1))
+        if self.is_on_board(capture_1):
+            piece_to_capture = board[tuple(capture_1)]
+            if piece_to_capture is not None and \
+                piece_to_capture.color != self.color:
+
+                possible_squares = np.vstack((possible_squares, capture_1))
+                piece_to_capture.attacked_by.append(self)
 
         capture_2 = np.copy(self.square)
         capture_2 += (direction, -1)
-        if self.is_on_board(capture_2) and \
-            board[tuple(capture_2)] is not None and \
-            board[tuple(capture_2)].color != self.color:
-            possible_squares = np.vstack((possible_squares, capture_2))
+        if self.is_on_board(capture_2):
+            piece_to_capture = board[tuple(capture_2)]
+            if piece_to_capture is not None and \
+                piece_to_capture.color != self.color:
+
+                possible_squares = np.vstack((possible_squares, capture_2))
+                piece_to_capture.attacked_by.append(self)
 
         return possible_squares
     

@@ -3,6 +3,7 @@ from .piece import *
 from enum import Enum
 import time
 import copy
+import chess # Only for ascii visualization
 
 class Result(Enum):
     WHITE_WIN = 0
@@ -87,7 +88,6 @@ class Position:
         """
         self._process_pieces()
 
-        t = time.time()
         self.white_legal_moves = self._calc_legal_moves_for_color(Color.White)
         self.black_legal_moves = self._calc_legal_moves_for_color(Color.Black)
     
@@ -169,21 +169,23 @@ class Position:
         player making the move to be in check.
         """
         moved_piece = self.position[tuple(move.from_square)]
-
-        if moved_piece.is_pinned:
-            return True
-
-        if not self.is_color_in_check(moved_piece.color):
-            return False
-
         op_controlled_squares = self.black_controlled_squares
         own_king = self.white_king
         if moved_piece.color == Color.Black:
             own_king = self.black_king
             op_controlled_squares = self.white_controlled_squares
 
+        if moved_piece.is_pinned:
+            return True
+            
+        if moved_piece.is_king() and op_controlled_squares[tuple(move.to_square)]:
+            return True
+
+        if not self.is_color_in_check(moved_piece.color):
+            return False
+
         # Color currently in check. Check if move evades check
-        if type(moved_piece) == King:
+        if moved_piece.is_king():
             # Make sure moves away from check
             return op_controlled_squares[tuple(move.to_square)]
 
@@ -251,30 +253,25 @@ class Board:
         for mstr in movestr.strip().split(" "):
             self.play_move(Move.parse_uci(mstr))
 
-    def play_move(self, move: Move) -> Result:
+    def play_move(self, move: Move):
         """ Makes the given move on the board. Raises an error if the move is illegal.
-        Returns the result if the game ends (None if game is still ongoing).
+        Returns the result if the game ends (None if game is still ongoing) and whether the move was played.
+        The might will not be played if the game has already ended.
         """
         if self.result != None:
-            return self.result
+            return self.result, False
 
-        t = time.time()
         if not self.position.is_legal(move):
             raise ValueError(f"Illegal move attempted: {move}")
 
-        t = time.time()
         self.moves.append(move)
 
         self.position_history.append(copy.deepcopy(self.position))
         self.position = self.position.make_move(move)
         self.position.process()
-        t = time.time()
         
-        t = time.time()
         self.update_game_result()
-        if self.result != None:
-            return self.result
-        return None
+        return self.result, True
 
     def update_game_result(self):
         next_color = self.next_move_color()
@@ -299,20 +296,10 @@ class Board:
         return pieces
 
     def undo_last_move(self):
-        # last_move = self.moves[-1]
-        # reverse_move = Move(last_move.to_square, last_move.from_square)
-        # self._make_move(reverse_move)
-        # moved_piece = self.position[tuple(last_move.from_square)]
-        # moved_piece.nr_moves -= 2 # Remove the original and reverse moves
-        # # Remove the two previous moves (reverse and original move)
-        # self.moves = self.moves[:-2]
-        # removed_move_index = len(self.moves)
-        # if removed_move_index in self.captures:
-        #     recovered_piece = self.captures.pop(removed_move_index)
-        #     self.position[tuple(recovered_piece.square)] = recovered_piece
-        # self.position._reevaluate()
         self.moves = self.moves[:-1]
         self.position = self.position_history.pop()
+        # Assume that the game must've been ongoing before the last move
+        self.result = None
 
     def get_last_move(self):
         """ Returns the last move made or None if no moves have been made.
@@ -423,3 +410,8 @@ class Board:
             return Queen(square, color)
         elif symbol == "k":
             return King(square, color)
+
+    def visualize(self):
+        vis_board = chess.Board()
+        vis_board.set_board_fen(self.board_fen())
+        print(vis_board)

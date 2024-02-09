@@ -11,6 +11,8 @@ Helsingin Yliopiston kurssia *Aineopintojen harjoitustyö: Algoritmit ja tekoäl
 
 [Testausdokumentti](documentation/testausdokumentti.md)
 
+[Toteutusdokumentti](documentation/toteutusdokumentti.md)
+
 ## Viikkoraportit
 
 [Viikko 1](documentation/viikkoraportit/viikko1.md)
@@ -18,6 +20,8 @@ Helsingin Yliopiston kurssia *Aineopintojen harjoitustyö: Algoritmit ja tekoäl
 [Viikko 2](documentation/viikkoraportit/viikko2.md)
 
 [Viikko 3](documentation/viikkoraportit/viikko3.md)
+
+[Viikko 4](documentation/viikkoraportit/viikko4.md)
 
 # Pelaaminen
 
