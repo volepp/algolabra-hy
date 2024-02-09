@@ -12,6 +12,9 @@ class Result(Enum):
 
 BOARD_SIZE = 8
 
+
+def flatten_moves(moves):
+    return [move for moveset in moves for move in moveset]
 class Position:
 
     def __init__(self, position: np.array = None):
@@ -84,6 +87,7 @@ class Position:
         """
         self._process_pieces()
 
+        t = time.time()
         self.white_legal_moves = self._calc_legal_moves_for_color(Color.White)
         self.black_legal_moves = self._calc_legal_moves_for_color(Color.Black)
     
@@ -91,39 +95,43 @@ class Position:
         """ Calculates the controlled squares for white and black. Also finds the white and black
         kings and stores them in self.white/black_king
         """
-        self.white_controlled_squares = np.full(self.white_controlled_squares.shape, False)
-        self.black_controlled_squares = np.full(self.black_controlled_squares.shape, False)
-        for (_, _), piece in np.ndenumerate(self.position):
+        pieces = self.position[self.position != None]
+        # First reset all piecces so that no pins or checks will be 
+        # accidentally left hanging around from e.g. a previous position.
+        for piece in pieces:
+            piece.reset()
+        for piece in pieces:
             if piece is None: continue
+            piece.calculate_controlled_squares(self.position)
             if type(piece) == King:
                 if piece.color == Color.White:
                     self.white_king = piece
                 else:
                     self.black_king = piece
 
-            piece.calculate_controlled_squares(self.position)
-            for sqr in piece.get_controlled_squares():
-                if piece.color == Color.White:
-                    self.white_controlled_squares[tuple(sqr)] = True
-                else:
-                    self.black_controlled_squares[tuple(sqr)] = True
+        white_controlled = np.vstack([\
+            piece.get_controlled_squares()\
+                for (_,_), piece in np.ndenumerate(self.position)\
+                    if piece is not None and piece.color == Color.White ])
+        black_controlled = np.vstack([\
+            piece.get_controlled_squares()\
+                for (_,_), piece in np.ndenumerate(self.position)\
+                    if piece is not None and piece.color == Color.Black ])
+        self.white_controlled_squares = np.full(self.white_controlled_squares.shape, False)
+        self.black_controlled_squares = np.full(self.black_controlled_squares.shape, False)
+        self.white_controlled_squares[white_controlled[:,0], white_controlled[:,1]] = True
+        self.black_controlled_squares[black_controlled[:,0], black_controlled[:,1]] = True
 
-    def _calc_legal_moves_for_color(self, color: Color) -> [Move]:
+    def _calc_legal_moves_for_color(self, color: Color):
         """ Calculates the legal moves.
         """
         legal_moves = []
-        for rank, file in np.ndindex(self.position.shape):
-            piece = self.position[rank, file]
-            if piece is None:
-                continue
-            if piece.color != color:
-                continue
-            
-            controlled_squares = piece.get_controlled_squares()
-            for csqr in controlled_squares:
-                move = Move(piece.square, csqr)
-                if self.is_legal(move):
-                    legal_moves.append(move)
+        color_pieces = self.position[self.position != None]
+        color_pieces = np.array([piece for piece in color_pieces if piece.color == color])
+
+        candidate_moves = [[Move(piece.square, to_square) for to_square in piece.get_controlled_squares()] for piece in color_pieces]
+        candidate_moves = flatten_moves(candidate_moves)
+        legal_moves = [move for move in candidate_moves if self.is_legal(move)]
 
         return legal_moves
 
@@ -153,7 +161,7 @@ class Position:
             return False
         
         if self._would_lead_to_check(move): return False
-            
+
         return True
 
     def _would_lead_to_check(self, move: Move) -> bool:
@@ -162,13 +170,41 @@ class Position:
         """
         moved_piece = self.position[tuple(move.from_square)]
 
-        result_pos = self.make_move(move)
-        result_pos._process_pieces()
-
-        # Check if player making the move would be in check afterwards
-        if result_pos.is_color_in_check(moved_piece.color):
+        if moved_piece.is_pinned:
             return True
 
+        if not self.is_color_in_check(moved_piece.color):
+            return False
+
+        op_controlled_squares = self.black_controlled_squares
+        own_king = self.white_king
+        if moved_piece.color == Color.Black:
+            own_king = self.black_king
+            op_controlled_squares = self.white_controlled_squares
+
+        # Color currently in check. Check if move evades check
+        if type(moved_piece) == King:
+            # Make sure moves away from check
+            return op_controlled_squares[tuple(move.to_square)]
+
+        # The moved piece is not the king. Check that the move 
+        # blocks the check.
+        
+        # First, if more than 1 piece checking, cannot block
+        if len(own_king.attacked_by) > 1:
+            return True
+        
+        # Check if blocks check by making the move and 
+        # checking if the previously checking pieces are still
+        # controlling the square the king is on in the new position.
+        result_pos = self.make_move(move)
+        checking_piece_sqrs = [piece.square for piece in own_king.attacked_by]
+        for sqr in checking_piece_sqrs:
+            p = result_pos.position[tuple(sqr)]
+            p.calculate_controlled_squares(result_pos.position)
+            csqrs = p.get_controlled_squares()
+            if own_king.square.tolist() in csqrs.tolist():
+                return True
         return False
 
     def is_color_in_check(self, color: Color) -> bool:
@@ -176,9 +212,9 @@ class Position:
         Expects self.white/black_controlled_squares to be up-to-date.
         """
         if color == Color.White:
-            return self.black_controlled_squares[tuple(self.white_king.square)]
+            return len(self.white_king.attacked_by) > 0
         else:
-            return self.white_controlled_squares[tuple(self.black_king.square)]
+            return len(self.black_king.attacked_by) > 0
 
     def __getitem__(self, key):
         return self.position.__getitem__(key)
@@ -213,7 +249,6 @@ class Board:
             self.moves = []
             return
         for mstr in movestr.strip().split(" "):
-            print(mstr)
             self.play_move(Move.parse_uci(mstr))
 
     def play_move(self, move: Move) -> Result:
@@ -255,7 +290,7 @@ class Board:
 
         self.result = None
 
-    def get_pieces_for_color(self, color: Color) -> [Piece]:
+    def get_pieces_for_color(self, color: Color):
         pieces = []
         for (_, _), piece in np.ndenumerate(self.position):
             if piece is not None and piece.color == color:
@@ -296,7 +331,7 @@ class Board:
     def get_nr_moves(self):
         return len(self.moves)
 
-    def get_legal_moves(self, color: Color) -> [Move]:
+    def get_legal_moves(self, color: Color):
         if color == Color.White:
             return self.position.white_legal_moves
         else:

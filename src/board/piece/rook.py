@@ -10,7 +10,7 @@ class Rook(Piece):
         self.controlled_squares = []
         possible_directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         for dir in possible_directions:
-            self.controlled_squares.extend(self.find_linear_squares(board, dir))
+            self.controlled_squares.extend(self.calculate_linear_squares(board, dir))
 
     def fen_symbol(self):
         if self.color == Color.White:

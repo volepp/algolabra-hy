@@ -7,10 +7,10 @@ class Bishop(Piece):
         super().__init__(square, color, 3)
 
     def calculate_controlled_squares(self, board: np.array):
-        self.controlled_squares = []
+        self.controlled_squares = np.empty((0,2), dtype=int)
         possible_directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
         for dir in possible_directions:
-            self.controlled_squares.extend(self.find_linear_squares(board, dir))
+            self.controlled_squares = np.vstack((self.controlled_squares, self.calculate_linear_squares(board, dir)))
     
     def fen_symbol(self):
         if self.color == Color.White:
