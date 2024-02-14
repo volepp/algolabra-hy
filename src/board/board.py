@@ -129,7 +129,7 @@ class Position:
         color_pieces = self.position[self.position != None]
         color_pieces = np.array([piece for piece in color_pieces if piece.color == color])
 
-        candidate_moves = [[Move(piece.square, to_square) for to_square in piece.get_controlled_squares()] for piece in color_pieces]
+        candidate_moves = [[Move(piece.square, to_square) for to_square in piece.get_movable_squares()] for piece in color_pieces]
         candidate_moves = flatten_moves(candidate_moves)
         legal_moves = [move for move in candidate_moves if self.is_legal(move)]
 
@@ -148,9 +148,9 @@ class Position:
             print("No piece on specified square")
             return False
         
-        # Check that the piece that is moved actually controls (can move to) the specified square.
-        controlled_squares = np.array(moved_piece.get_controlled_squares())
-        if move.to_square.tolist() not in controlled_squares.tolist():
+        # Check that the piece that is moved can move to the specified square.
+        movable_squares = np.array(moved_piece.get_movable_squares())
+        if move.to_square.tolist() not in movable_squares.tolist():
             print("Not a controlled square")
             return False
         

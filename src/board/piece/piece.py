@@ -32,13 +32,22 @@ class Piece:
 
     def calculate_controlled_squares(self, board: np.array):
         """ Finds the squares the piece controls in the given position
-        and stores them in self.controlled_squares
+        and stores them in self.controlled_squares. Also recalculates
+        the movable squares in case those are different from the controlled
+        squares (pawn).
         """
         pass
 
     def get_controlled_squares(self) -> np.array:
-        """ Returns the possible moves for this piece in the given position
+        """ Returns the squares this piece controls in the given position
         or None if no controlled squares
+        """
+        return self.controlled_squares
+    
+    def get_movable_squares(self) -> np.array:
+        """ Returns the squares where the piece can move.
+        By default the same as controlled squares. The only exception
+        is the pawn who doesn't control the squares in front of it.
         """
         return self.controlled_squares
 

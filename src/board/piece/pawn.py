@@ -1,3 +1,4 @@
+from numpy.core.multiarray import array as array
 from . import Piece, Color, Move
 import numpy as np
 
@@ -5,15 +6,19 @@ class Pawn(Piece):
 
     def __init__(self, square: np.array, color: Color):
         super().__init__(square, color, 1)
+        self.movable_squares = []
 
-        # Assume that has moved if not on the second or 7th rank
+        # Has to have moved if not on the 2nd or 7th rank
         if square is not None and square[0] != 1 and square[0] != 6:
             self.nr_moves = 1
 
+    def get_movable_squares(self) -> np.array:
+        return self.movable_squares
+
     def calculate_controlled_squares(self, board: np.array):
-        # TODO think this through because technically the pawn doesn't
-        # control the squares in front of it
-        self.controlled_squares = np.vstack((self.get_advances(board), self.get_captures(board)))    
+        self.controlled_squares = self.get_capture_squares(board)
+        self.movable_squares = np.vstack(\
+            (self.get_advances(board), self.get_possible_captures(board, self.controlled_squares)))
 
     def get_advances(self, board: np.array) -> np.array:
         possible_squares = np.empty((0,2), dtype=int)
@@ -37,33 +42,36 @@ class Pawn(Piece):
 
         return possible_squares
     
-    def get_captures(self, board: np.array) -> np.array:
-        possible_squares = np.empty((0,2), dtype=int)
+    def get_capture_squares(self, board: np.array) -> np.array:
+        capture_squares = np.empty((0,2), dtype=int)
         # If white, move up the board, down otherwise
         direction = 1 if self.color == Color.White else -1
 
         capture_1 = np.copy(self.square)
         capture_1 += (direction, 1)
         if self.is_on_board(capture_1):
-            piece_to_capture = board[tuple(capture_1)]
-            if piece_to_capture is not None and \
-                piece_to_capture.color != self.color:
-
-                possible_squares = np.vstack((possible_squares, capture_1))
-                piece_to_capture.attacked_by.append(self)
+            capture_squares = np.vstack((capture_squares, capture_1))
 
         capture_2 = np.copy(self.square)
         capture_2 += (direction, -1)
         if self.is_on_board(capture_2):
-            piece_to_capture = board[tuple(capture_2)]
-            if piece_to_capture is not None and \
+            capture_squares = np.vstack((capture_squares, capture_2))
+
+        return capture_squares
+    
+    def get_possible_captures(self, board: np.array, capture_squares: np.array) -> np.array:
+        possible_captures = np.empty((0,2), dtype=int)
+        for sqr in capture_squares:
+            piece_to_capture = board[tuple(sqr)]
+            if piece_to_capture is not None and\
                 piece_to_capture.color != self.color:
 
-                possible_squares = np.vstack((possible_squares, capture_2))
-                piece_to_capture.attacked_by.append(self)
+                possible_captures = np.vstack((possible_captures, sqr))
+                piece_to_capture.attacked_by.append(self)            
 
-        return possible_squares
-    
+        return possible_captures
+
+
     def fen_symbol(self):
         if self.color == Color.White:
             return "P"

@@ -8,7 +8,7 @@ class TestPieces(unittest.TestCase):
     def setUp(self):
         self.board = Board()
 
-    def test_king_controlled_squares(self):
+    def test_king_controlled_and_movable_squares(self):
         # Kings should control 5 squares when game starts
         self.assertEqual(len(self.board.position.white_king.get_controlled_squares()), 5)
         self.assertEqual(len(self.board.position.black_king.get_controlled_squares()), 5)
@@ -17,7 +17,12 @@ class TestPieces(unittest.TestCase):
         self.assertEqual(len(self.board.position.white_king.get_controlled_squares()), 8)
         self.assertEqual(len(self.board.position.black_king.get_controlled_squares()), 8)
 
-    def test_knight_controlled_squares(self):
+        self.assertTrue((self.board.position.white_king.get_controlled_squares()\
+                          == self.board.position.white_king.get_movable_squares()).all())
+        self.assertTrue((self.board.position.black_king.get_controlled_squares()\
+                          == self.board.position.black_king.get_movable_squares()).all())
+
+    def test_knight_controlled_and_movable_squares(self):
         white_knight_1 = self.board.position[0, 1]
         white_knight_2 = self.board.position[0, 6]
         black_knight_1 = self.board.position[7, 1]
@@ -33,7 +38,10 @@ class TestPieces(unittest.TestCase):
         self.assertEqual(len(white_knight.get_controlled_squares()), 8)
         self.assertEqual(len(black_knight.get_controlled_squares()), 6)
 
-    def test_bishop_controlled_squares(self):
+        self.assertTrue((white_knight.get_controlled_squares() == white_knight.get_movable_squares()).all())
+        self.assertTrue((black_knight.get_controlled_squares() == black_knight.get_movable_squares()).all())
+
+    def test_bishop_controlled_and_movable_squares(self):
         wb1 = self.board.position[0,2]
         wb2 = self.board.position[0,5]
         bb1 = self.board.position[7,2]
@@ -49,7 +57,10 @@ class TestPieces(unittest.TestCase):
         self.assertEqual(len(wb.get_controlled_squares()), 8)
         self.assertEqual(len(bb.get_controlled_squares()), 13)
 
-    def test_queen_controlled_squares(self):
+        self.assertTrue((wb.get_controlled_squares() == wb.get_movable_squares()).all())
+        self.assertTrue((bb.get_controlled_squares() == bb.get_movable_squares()).all())
+
+    def test_queen_controlled_and_movable_squares(self):
         wq = self.board.position[0,3]
         bq = self.board.position[7,3]
         self.assertEqual(len(wq.get_controlled_squares()), 5)
@@ -60,8 +71,11 @@ class TestPieces(unittest.TestCase):
         bq = self.board.position[4, 4]
         self.assertEqual(len(wq.get_controlled_squares()), 19)
         self.assertEqual(len(bq.get_controlled_squares()), 20)
+
+        self.assertTrue((wq.get_controlled_squares() == wq.get_movable_squares()).all())
+        self.assertTrue((bq.get_controlled_squares() == bq.get_movable_squares()).all())
         
-    def test_rook_controlled_squares(self):
+    def test_rook_controlled_and_movable_squares(self):
         wr1 = self.board.position[0,0]
         wr2 = self.board.position[0,7]
         br1 = self.board.position[7,0]
@@ -77,10 +91,17 @@ class TestPieces(unittest.TestCase):
         self.assertEqual(len(wr.get_controlled_squares()), 14)
         self.assertEqual(len(br.get_controlled_squares()), 11)
 
-    def test_pawn_controlled_squares(self):
+        self.assertTrue((wr.get_controlled_squares() == wr.get_movable_squares()).all())
+        self.assertTrue((br.get_controlled_squares() == br.get_movable_squares()).all())
+
+    def test_pawn_controlled_and_movable_squares(self):
         for (_, _), piece in np.ndenumerate(self.board.position.position):
             if type(piece) == Pawn:
-                # TODO: Currently considers the squares in front of the pawn controlled as well which will have to be fixed
+                if piece.square[1] == 0 or piece.square[1] == 7:
+                    # Corner pawn
+                    self.assertEqual(len(piece.get_controlled_squares()), 1)
+                    continue
+
                 self.assertEqual(len(piece.get_controlled_squares()), 2)
 
         self.board.load_board_fen("8/4p3/3k1P2/4N3/3K4/8/8/8")
@@ -90,6 +111,7 @@ class TestPieces(unittest.TestCase):
         wp.calculate_controlled_squares(self.board.position)
         bp.nr_moves = 0
         bp.calculate_controlled_squares(self.board.position)
-        print(wp.get_controlled_squares())
         self.assertEqual(len(wp.get_controlled_squares()), 2)
         self.assertEqual(len(bp.get_controlled_squares()), 2)
+        self.assertEqual(len(wp.get_movable_squares()), 2) # Forward and capture
+        self.assertEqual(len(bp.get_movable_squares()), 2) # Forward and capture

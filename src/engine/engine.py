@@ -41,9 +41,15 @@ class Engine:
             if player_to_move == Color.White and eval > best_move_eval:
                 best_move_eval = eval
                 best_move = move
+                if eval == math.inf:
+                    # Stop after finding the first checkmate
+                    break
             elif player_to_move == Color.Black and eval < best_move_eval:
                 best_move_eval = eval
                 best_move = move
+                if eval == -math.inf:
+                    # Stop after finding the first checkmate
+                    break
 
         return (best_move, best_move_eval)
     
