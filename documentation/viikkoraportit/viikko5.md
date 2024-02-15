@@ -6,8 +6,9 @@
 
 | Päivä | Käytetty aika | Kuvaus |
 | ----- | ------------- | ------ |
-| 15.2.  | 1h            | Pelilogiikan korjaamista |
-| Yhteensä | 1h         |        |
+| 14.2.  | 1h            | Pelilogiikan korjaamista |
+| 15.2.  | 3h            | Evaluointialgoritmin parantamista, bugifiksailua |
+| Yhteensä | 4h         |        |
 
 ## Jatko
 
