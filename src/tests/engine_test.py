@@ -33,7 +33,6 @@ class TestEngine(unittest.TestCase):
         self.board.load_board_fen("8/8/4ppp1/3p1k1p/5P2/4PKPP/8/8")
         self.engine.max_depth = 3
         move = self.engine.make_move(self.board)
-        print(move)
         self.assertEqual(move, move.parse_uci("g3g4"))
         self.board.play_move(move)
         self.board.play_move(Move.parse_uci("h5g4"))

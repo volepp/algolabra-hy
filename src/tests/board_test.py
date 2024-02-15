@@ -61,8 +61,10 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(len(legal_moves), 20)
 
         # Load position which only has one legal move to escape check
-        self.board.load_board_fen("2K5/3q2n1/2k5/5P2/3b4/1pQ3N1/8/8") 
+        self.board.load_board_fen("2K5/3q2n1/2k5/5P2/3b4/1p4N1/8/8") 
+        self.board.visualize()
         legal_moves = self.board.get_legal_moves(Color.White)
+        print(legal_moves)
         self.assertEqual(len(legal_moves), 1)
         self.assertEqual(legal_moves[0], Move.parse_uci("c8b8"))
 

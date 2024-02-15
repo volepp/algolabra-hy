@@ -177,35 +177,38 @@ class Position:
 
         if moved_piece.is_pinned:
             return True
-            
-        if moved_piece.is_king() and op_controlled_squares[tuple(move.to_square)]:
-            return True
-
-        if not self.is_color_in_check(moved_piece.color):
-            return False
 
         # Color currently in check. Check if move evades check
         if moved_piece.is_king():
             # Make sure moves away from check
-            return op_controlled_squares[tuple(move.to_square)]
-
-        # The moved piece is not the king. Check that the move 
-        # blocks the check.
-        
-        # First, if more than 1 piece checking, cannot block
-        if len(own_king.attacked_by) > 1:
-            return True
+            if op_controlled_squares[tuple(move.to_square)]:
+                return True
+        else:
+            # If not moving the king and not pinned. The move
+            # cannot lead to check if not in check already.
+            if not self.is_color_in_check(moved_piece.color):
+                return False
+            
+            # If not moving the king, cannot block 2 checks at once
+            if len(own_king.attacked_by) > 1:
+                return True
         
         # Check if blocks check by making the move and 
         # checking if the previously checking pieces are still
         # controlling the square the king is on in the new position.
+        # Also makes sure that if the moving piece is the king, 
+        # actually evades the check instead of e.g. moving backwards "away"
+        # from a rook check.
+        own_king_sqr = own_king.square
+        if moved_piece.is_king():
+            own_king_sqr = move.to_square
         result_pos = self.make_move(move)
         checking_piece_sqrs = [piece.square for piece in own_king.attacked_by]
         for sqr in checking_piece_sqrs:
             p = result_pos.position[tuple(sqr)]
             p.calculate_controlled_squares(result_pos.position)
             csqrs = p.get_controlled_squares()
-            if own_king.square.tolist() in csqrs.tolist():
+            if own_king_sqr.tolist() in csqrs.tolist():
                 return True
         return False
 

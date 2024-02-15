@@ -79,7 +79,6 @@ class Engine:
                 nr_nodes_visited += nnodes
                 best_eval = max(best_eval, eval)
                 if best_eval > beta:
-                    print("beta cutoff")
                     break
                 alpha = max(alpha, best_eval)
             board.undo_last_move()
@@ -91,7 +90,6 @@ class Engine:
                 nr_nodes_visited += nnodes
                 best_eval = min(best_eval, eval)
                 if best_eval < alpha:
-                    print("alpha cutoff")
                     break
                 beta = min(beta, best_eval)
             board.undo_last_move()
