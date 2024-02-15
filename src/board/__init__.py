@@ -1,1 +1,1 @@
-from .board import Board, Result
+from .board import Board, Position, Result

@@ -217,6 +217,34 @@ class Position:
             return len(self.white_king.attacked_by) > 0
         else:
             return len(self.black_king.attacked_by) > 0
+        
+    def get_square_value_weights(self):
+        """ Returns weights between 0 and 1 to all the squares based on 
+        how valuable the square is to control. In general, central squares 
+        are considered higher value as well as squares closer to the enemy king. 
+        """
+        weights = np.zeros((BOARD_SIZE, BOARD_SIZE), dtype=float)
+        # The basic idea is that the central squares are 0.5 and the weight
+        # decreases linearly the further we go from the center.
+        center_weight = 0.5
+        weights[3:5, 3:5] = center_weight
+        non_center_coordinates = np.argwhere(weights == 0)
+        # Distance from center (in theory can be thought of as (3.5, 3.5))
+        coordinate_distances = np.abs(non_center_coordinates.astype(float)-np.array([3.5, 3.5]))
+        coordinate_distances = np.linalg.norm(coordinate_distances, axis=1)
+        weights[tuple(zip(*non_center_coordinates))] = center_weight/coordinate_distances
+        
+        return weights
+    
+    def get_control_scores(self):
+        """ Returns the total sum of values of controlled squares weighted by 
+        how important the squares are (get_square_value_weights) for white and black respectively.
+        """
+        square_weights = self.get_square_value_weights()
+        white_score = np.sum(np.multiply(self.white_controlled_squares, square_weights))
+        black_score = np.sum(np.multiply(self.black_controlled_squares, square_weights))
+
+        return white_score, black_score
 
     def __getitem__(self, key):
         return self.position.__getitem__(key)

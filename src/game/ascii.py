@@ -43,7 +43,7 @@ class AsciiGame(Game):
         return result
 
     def render(self):
-        os.system("clear")
+        # os.system("clear")
         self.visual_board.set_board_fen(self.board.board_fen())
         print(self.visual_board)
         print("Legal moves (W): ", self.board.get_legal_moves(Color.White))
