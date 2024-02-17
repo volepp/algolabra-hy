@@ -12,6 +12,8 @@ Projektissa testataan ainoastaan pelilogiikaan ja tekoälyyn liittyviä moduulei
 
 Testit ajetaan CI:ssä automaattisesti ja testeistä generoidaan kattavuusraportti, joka ladataan Codecoviin. Tämän avulla Codecovista saadaan tietoa testikattavuudesta esimerkiksi README:n alkuun ja tähän dokumenttiin.
 
+Tekoälyn testaamiseen on käytetty myös chess.com-sivustolta otettuja puzzle-harjoituksia. Kyseessä on lyhyitä, muutaman siirron sarjoja, jotka johtavat pelaajan voittoon tai voittavaan positioon pääsemiseen. Puzzleista saa hyviä testejä, sillä niihin on objektiivisesti vain yksi oikea vastaus. Tällä hetkellä käytetyt puzzlet ovat erilaisia pakotettuja shakkimatteja kahdella siirrolla. Testi varmistaa, että tekoäly löytää oikean siirron, joka ratkaisee puzzlen.
+
 ## Testien ajaminen
 
 Testit voi ajaa repositorion juuressa seuraavalla komennolla:
