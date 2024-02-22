@@ -15,10 +15,10 @@ class Pawn(Piece):
     def get_movable_squares(self) -> np.array:
         return self.movable_squares
 
-    def calculate_controlled_squares(self, board: np.array):
+    def calculate_controlled_squares(self, board: np.array, dry_run=False):
         self.controlled_squares = self.get_capture_squares(board)
         self.movable_squares = np.vstack(\
-            (self.get_advances(board), self.get_possible_captures(board, self.controlled_squares)))
+            (self.get_advances(board), self.get_possible_captures(board, self.controlled_squares, dry_run=dry_run)))
 
     def get_advances(self, board: np.array) -> np.array:
         possible_squares = np.empty((0,2), dtype=int)
@@ -59,7 +59,7 @@ class Pawn(Piece):
 
         return capture_squares
     
-    def get_possible_captures(self, board: np.array, capture_squares: np.array) -> np.array:
+    def get_possible_captures(self, board: np.array, capture_squares: np.array, dry_run=False) -> np.array:
         possible_captures = np.empty((0,2), dtype=int)
         for sqr in capture_squares:
             piece_to_capture = board[tuple(sqr)]
@@ -67,7 +67,8 @@ class Pawn(Piece):
                 piece_to_capture.color != self.color:
 
                 possible_captures = np.vstack((possible_captures, sqr))
-                piece_to_capture.attacked_by.append(self)            
+                if not dry_run:
+                    piece_to_capture.attacked_by.append(self)            
 
         return possible_captures
 

@@ -30,11 +30,12 @@ class Piece:
         self.nr_moves -= 1
         self.square = move.from_square
 
-    def calculate_controlled_squares(self, board: np.array):
+    def calculate_controlled_squares(self, board: np.array, dry_run=False):
         """ Finds the squares the piece controls in the given position
         and stores them in self.controlled_squares. Also recalculates
         the movable squares in case those are different from the controlled
         squares (pawn).
+        If dry_run is True, doesn't make any updates to other pieces (attacked_by, is_pinned...)
         """
         pass
 
@@ -77,12 +78,13 @@ class Piece:
         self.pinning = []
         self.attacked_by = []
 
-    def calculate_linear_squares(self, position: np.array, direction: tuple) -> np.array:
+    def calculate_linear_squares(self, position: np.array, direction: tuple, dry_run=False) -> np.array:
         """ Calculates controlled squares by linearly following the specified direction until
         out of board or blocked by another piece that cannot be captured.
         If x-rays the opponent king through an oppponent piece, marks the opponent
         piece as pinned by setting its .is_pinned to True. If is checking the king,
         sets the king's is_checked to True.
+        If dry_run is True, doesn't update attacked_by and is_pinned of other pieces.
         """
         squares = np.empty((0,2), dtype=int)
         (nr_ranks, _) = position.shape
@@ -101,7 +103,8 @@ class Piece:
                 elif attacked_piece is None:
                     # Attacking the piece (instead of x-raying it)
                     squares = np.vstack((squares, resulting_square))
-                    piece.attacked_by.append(self)
+                    if not dry_run:
+                        piece.attacked_by.append(self)
                     if piece.is_king():
                         # No need to continue and check for pins
                         # if attacking the opponent king
@@ -113,8 +116,9 @@ class Piece:
                     # i.e. exploring "x-rayed" pieces.
                     if piece.is_king():
                         # X-raying the king behind the attacked_piece
-                        attacked_piece.is_pinned = True
-                        self.pinning.append(attacked_piece)
+                        if not dry_run:
+                            attacked_piece.is_pinned = True
+                            self.pinning.append(attacked_piece)
                     break # No need to go further, cannot x-ray more than one piece.
                     
             if attacked_piece is None:

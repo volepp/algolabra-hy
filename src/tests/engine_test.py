@@ -44,6 +44,6 @@ class TestEngine(unittest.TestCase):
         self.board.play_move(Move.parse_uci("a7a5"))
         self.board.play_move(Move.parse_uci("b2b4"))
         legal_moves = self.board.get_legal_moves(Color.Black)
-        self.engine.sort_moves_by_potential(self.board, legal_moves)
+        self.engine.sort_moves_by_evaluation(self.board, legal_moves)
         # Capture should be the most interesting
         self.assertEqual(legal_moves[0], Move.parse_uci("a5b4"))

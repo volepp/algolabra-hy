@@ -249,6 +249,16 @@ class Position:
 
         return white_score, black_score
 
+    def get_piece_control_score(self, piece):
+        """ Returns the sum of the values of the squares that the given piece controls.
+        """
+        square_weights = self.get_square_value_weights()
+        piece_control_score = 0
+        for square in piece.get_controlled_squares():
+            piece_control_score += square_weights[tuple(square)]
+
+        return piece_control_score
+
     def __getitem__(self, key):
         return self.position.__getitem__(key)
 
@@ -284,7 +294,7 @@ class Board:
         for mstr in movestr.strip().split(" "):
             self.play_move(Move.parse_uci(mstr))
 
-    def play_move(self, move: Move):
+    def play_move(self, move: Move, check_legality=True):
         """ Makes the given move on the board. Raises an error if the move is illegal.
         Returns the result if the game ends (None if game is still ongoing) and whether the move was played.
         The might will not be played if the game has already ended.
@@ -292,7 +302,7 @@ class Board:
         if self.result != None:
             return self.result, False
 
-        if not self.position.is_legal(move):
+        if check_legality and not self.position.is_legal(move):
             raise ValueError(f"Illegal move attempted: {move}")
 
         self.moves.append(move)
@@ -382,6 +392,14 @@ class Board:
                 # No slash on the last rank
                 fen += "/"
             
+        return fen
+
+    def fen(self):
+        fen = self.board_fen()
+        if self.next_move_color() == Color.White:
+            fen += " w"
+        else:
+            fen += " b"
         return fen
 
     def load_board_fen(self, fen: str):

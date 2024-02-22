@@ -14,7 +14,7 @@ class King(Piece):
     def is_king(self):
         return True
 
-    def calculate_controlled_squares(self, board: np.array):
+    def calculate_controlled_squares(self, board: np.array, dry_run=False):
         self.controlled_squares = np.empty((0,2), dtype=int)
         possible_directions = np.array(np.meshgrid([-1,0,1], [-1,0,1])).T.reshape(-1, 2)
         for [d_rank, d_file] in possible_directions:
