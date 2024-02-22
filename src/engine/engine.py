@@ -110,8 +110,8 @@ class Engine:
         
         # The move can be assumed legal
         result, _ = board.play_move(move, check_legality=False)
-        # print("played", move)
         if result is not None:
+            board.undo_last_move()
             return self.get_evaluation_from_result(result), nr_nodes_visited
         
         player_to_move = board.next_move_color()
