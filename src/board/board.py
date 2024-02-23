@@ -205,10 +205,10 @@ class Position:
         result_pos = self.make_move(move)
         checking_piece_sqrs = [piece.square for piece in own_king.attacked_by]
         for sqr in checking_piece_sqrs:
-            p = result_pos.position[tuple(sqr)]
-            p.calculate_controlled_squares(result_pos.position)
-            csqrs = p.get_controlled_squares()
-            if own_king_sqr.tolist() in csqrs.tolist():
+            piece = result_pos.position[tuple(sqr)]
+            piece.calculate_controlled_squares(result_pos.position)
+            piece_controlled_squares = piece.get_controlled_squares()
+            if own_king_sqr.tolist() in piece_controlled_squares.tolist():
                 return True
         return False
 

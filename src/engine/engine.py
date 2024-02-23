@@ -69,6 +69,9 @@ class Engine:
                         break
                     beta = best_move_eval
 
+            if abs(best_move_eval) == math.inf:
+                break # Checkmate found
+
             self.move_memory[board_fen] = best_move
             legal_moves = self.sort_best_move_first(board, legal_moves)
 
@@ -77,7 +80,7 @@ class Engine:
                 print(f"Evaluation: {best_move_eval}, depth: {current_depth}, time: {time.time()-start_of_search_ts} seconds")
                 return (best_move, best_move_eval)
 
-        print(f"Evaluation: {best_move_eval}, depth: {max_depth}, time: {time.time()-start_of_search_ts} seconds")
+        print(f"Evaluation: {best_move_eval}, depth: {current_depth}, time: {time.time()-start_of_search_ts} seconds")
         return (best_move, best_move_eval)
 
     def sort_best_move_first(self, board: Board, moves):
@@ -127,6 +130,9 @@ class Engine:
                 if eval > best_eval:
                     best_eval = eval
                     alpha = max(alpha, best_eval)
+
+                if best_eval == math.inf:
+                    break # Checkmate found
                 if best_eval > beta:
                     break
             board.undo_last_move()
@@ -139,6 +145,9 @@ class Engine:
                 if eval < best_eval:
                     best_eval = eval
                     beta = min(beta, best_eval)
+
+                if best_eval == -math.inf:
+                    break # Checkmate found
                 if best_eval < alpha:
                     break
             board.undo_last_move()
