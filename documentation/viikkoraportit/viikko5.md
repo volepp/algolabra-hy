@@ -1,4 +1,4 @@
-# Viikkoraportti, viikko 4
+# Viikkoraportti, viikko 5
 
 Tällä viikolla keskityin korjaamaan joitakin havaitsemiani bugeja ja parantelemaan pelitilanteen evaluointialgoritmia. Sain ohjelman pelaamaan jo huomattavasti järkevämmin. Yksi merkittävä parannus on se, että keskustan kontrolloimiselle annetaan nyt enemmän painoarvoa. Tämä antoi ohjelmalle jonkinlaisen suunnan siirtojen miettimiseen tilanteessa, jossa välitöntä materiaalin menettämis- tai saantimahdollisuutta ei ole. Lopputulos oli jo paljon luonnollisemmalta tuntuva vastustaja, mutta parannettavaa ehdottomasti vielä on. 
 
