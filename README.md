@@ -27,7 +27,14 @@ Helsingin Yliopiston kurssia *Aineopintojen harjoitustyö: Algoritmit ja tekoäl
 
 # Pelaaminen
 
-Ohjelmaa vastaan voi pelata joko komentorivillä ASCII-käyttöliittymää käyttäen tai Lichessissä yhdistämällä ohjelman bottikäyttäjään, jonka siirrot se tekee. 
+Ohjelmaa vastaan voi pelata joko komentorivillä ASCII-käyttöliittymää käyttäen tai Lichessissä yhdistämällä ohjelman bottikäyttäjään, jonka siirrot se tekee.
+
+Asenna aluksi riippuvuudet ja aktiovi poetry shell seuraaville komennoilla:
+
+```
+poetry install
+poetry shell
+```
 
 ## Pelaaminen komentorivillä
 
