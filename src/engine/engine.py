@@ -190,6 +190,17 @@ class Engine:
         moved_piece.square = original_square
         moved_piece.calculate_controlled_squares(position.position)
 
+        # If the moved piece can be captured after the move, we have to remove it's value from
+        # the evaluation just to be safe. Otherwise, with odd depth (e.g. 3), we can run into situations
+        # where the AI captures a piece in the end without realizing that the opponent can capture it
+        # directly after. This could result in the AI making nonsensical moves and not protecting its pieces.
+
+        if moved_piece.color == Color.White:
+            if position.black_controlled_squares[tuple(move.to_square)]:
+                eval -= (moved_piece.value+piece_control_score_loss)
+        elif position.white_controlled_squares[tuple(move.to_square)]:
+            eval += (moved_piece.value+piece_control_score_loss)
+
         # If another piece is captured, update the control score for the captured piece's side
         # and take the material loss into account.
         # Here the move is assumed to be legal.
@@ -200,7 +211,10 @@ class Engine:
 
         captured_piece = position[tuple(move.to_square)]
         # First, update the material count
-        eval -= captured_piece.value
+        if captured_piece.color == Color.White:
+            eval -= captured_piece.value
+        else:
+            eval += captured_piece.value
 
         # Then update the control score
         if captured_piece.color == Color.White:

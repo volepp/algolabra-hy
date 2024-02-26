@@ -169,6 +169,7 @@ class Position:
         player making the move to be in check.
         """
         moved_piece = self.position[tuple(move.from_square)]
+        captured_piece = self.position[tuple(move.to_square)] # Can be None if square empty
         op_controlled_squares = self.black_controlled_squares
         own_king = self.white_king
         if moved_piece.color == Color.Black:
@@ -176,6 +177,9 @@ class Position:
             op_controlled_squares = self.white_controlled_squares
 
         if moved_piece.is_pinned:
+            if captured_piece is not None and moved_piece in captured_piece.pinning:
+                # Capturing the pinning piece simultaneously removes the pin
+                return False
             return True
 
         # Color currently in check. Check if move evades check
