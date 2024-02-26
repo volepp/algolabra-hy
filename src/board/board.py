@@ -291,7 +291,13 @@ class Board:
         if len(movestr) == 0:
             self.moves = []
             return
-        for mstr in movestr.strip().split(" "):
+        for i, mstr in enumerate(movestr.strip().split(" ")):
+            if len(self.moves) > i:
+                if self.moves[i] == Move.parse_uci(mstr):
+                    continue # Move already played
+                # Some other move played instead than what's in memory.
+                # Undo all moves after the last verified move (that can be found in movestr)
+                self.moves = self.moves[:i]
             self.play_move(Move.parse_uci(mstr))
 
     def play_move(self, move: Move, check_legality=True):

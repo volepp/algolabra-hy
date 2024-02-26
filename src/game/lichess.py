@@ -20,6 +20,7 @@ class LichessGame(Game):
         """
         while True:
             self.wait_for_challenge()
+            print("Challenge accepted. Game starting...")
             self.play()
 
     def play(self):
@@ -44,6 +45,7 @@ class LichessGame(Game):
         if gs["status"] == "resigned":
             self.game_id = None
             self.color = None
+            print("Opponent resigned")
             return
         
         # Get player move
@@ -65,12 +67,6 @@ class LichessGame(Game):
             return None
         moves = movestr.strip().split(" ")
         return moves[-1]
-    
-    def get_turn_color(self, moves):
-        """ Returns which color should move next
-        Note: might move this to the Board class
-        """
-
 
     def wait_for_challenge(self):
         """ Wait for a challenge in Lichess and accept it.
