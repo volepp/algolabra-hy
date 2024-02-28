@@ -2,6 +2,7 @@ from game import Game
 import berserk
 from engine import *
 from board.piece import Color
+from board import Result
 
 class LichessGame(Game):
 
@@ -50,9 +51,23 @@ class LichessGame(Game):
         
         # Get player move
         self.board.update_moves(gs["moves"])
+        result = self.board.get_result()
+        if result is not None:
+            self.print_result_and_exit(result)
         if self.board.next_move_color() == self.color:
             self.make_engine_move()
     
+    def print_result_and_exit(self, result):
+        if result == Result.WHITE_WIN:
+            print("White won")
+        elif result == Result.BLACK_WIN:
+            print("Black won")
+        elif result == Result.STALEMATE:
+            print("Stalemate")
+        elif result == Result.DRAW:
+            print("Draw")
+        exit(0)
+
     def make_engine_move(self):
         engine_move = self.engine.make_move(self.board)
         self.client.bots.make_move(self.game_id, engine_move)
