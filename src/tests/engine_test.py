@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import math
 from board import Board
 from board.piece import Move, Color
 from engine import Engine
@@ -24,14 +25,16 @@ class TestEngine(unittest.TestCase):
     def test_checkmate_in_two(self):
         # https://www.chess.com/puzzles/problem/564204
         self.board.load_board_fen("8/5ppk/p2R4/1p6/5PK1/1P5N/1r1p4/8")
-        move = self.engine.make_move(self.board)
+        (move, eval) = self.engine.find_best_move(self.board)
         self.assertEqual(move, move.parse_uci("h3g5"))
+        self.assertEqual(eval, math.inf) # Check that knows it will be checkmate
 
     def test_pawn_checkmate_in_two(self):
         # https://www.chess.com/puzzles/problem/480308
         self.board.load_board_fen("8/8/4ppp1/3p1k1p/5P2/4PKPP/8/8")
-        move = self.engine.make_move(self.board)
+        (move, eval) = self.engine.find_best_move(self.board)
         self.assertEqual(move, move.parse_uci("g3g4"))
+        self.assertEqual(eval, math.inf)
         self.board.play_move(move)
         self.board.play_move(Move.parse_uci("h5g4"))
         move = self.engine.make_move(self.board)

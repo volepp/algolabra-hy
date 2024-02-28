@@ -12,7 +12,7 @@ Käyttöliittymä on game-moduulissa ja se on toteutettu kolmannen osapuolen kir
 
 Minmaxia on parannettu alpha-beta-karsinnalla. Alpha-beta-karsinnan performanssia on taas pyritty parantamaan siirtojen läpikäyntijärjestystä parantamalla. 
 
-Algoritmi toimii siten, että tilanne analysoidaan ensin syvyydellä 1 (evaluoidaan vain jokainen siirto). Tämän jälkeen lähdetään analysoimaan syvyydellä 2. Kun haku on valmis, tarkistetaan menikö hakuun yli 5 sekuntia. Jos ei, siirrytään seuraavaan syvyyteen (syvyyteen 3), analysoidaan sillä, ja taas varmistetaan kauanko hakuun meni. Kun syvyyden analysointiin menee ensimmäisen kerran yli 5 sekuntia, ei siirrytä seuraavaan syvyyteen ja palautetaan edellisellä iteraatiolla löydetty paras siirto.
+Algoritmissa on käytössä iteratiivinen syveneminen. Käytännössä tämä tarkoittaa sitä, että tilanne analysoidaan ensin syvyydellä 1 (evaluoidaan vain jokainen siirto ilman rekursiota), jonka jälkeen lähdetään analysoimaan syvyydellä 2. Kun haku on valmis, tarkistetaan menikö hakuun yli 5 sekuntia. Jos ei, siirrytään seuraavaan syvyyteen (syvyyteen 3), analysoidaan sillä, ja taas varmistetaan kauanko hakuun meni. Kun syvyyden analysointiin menee ensimmäisen kerran yli 5 sekuntia, ei siirrytä seuraavaan syvyyteen ja palautetaan edellisellä iteraatiolla löydetty paras siirto.
 
 Läpikäyntijärjestystä parannetaan syvyydelle 2 siten, että jokainen siirto arvoidaan (syvyys 1) ja järjestetään evaluaationsa perusteella. Hakua tehdessä aina paras syvyydellä löydetty siirto talletetaan muistiin. Myöhemmillä syvyyksillä, jos positio löytyy välimuistista, nostetaan paras siirto läpikäytävien siirtojen listassa ensimmäiseksi. Tämä tehostaa alpha-beta-karsintaa nostamalla alpha- ja beta-katkaisujen todennäköisyyttä. 
 
@@ -37,10 +37,6 @@ Alpha-beta pruningin avulla pahimmassa tapauksessa aikavaativuus ei muutu minmax
 ## Tilavaativuus
 
 Muistia käytetään oikeastaan vain pelilaudan tilanteen ylläpitämiseen. Pelilaudan positio on esitetty 8x8 taulukon avulla. Tämän lisäksi rekursiivista algoritmiä varten menneitä positioita pidetään pinossa, josta edellinen tilanne on helppo palauttaa. Täten tilan käyttö on riippuvainen siirtojen määrästä n (tilavaativuus O(n)).
-
-## Parannusajatukset
-
-Seuraava merkittävä optimointiaskel, joka ohjelmaan täytyy tehdä on minmaxissa läpikäytävien solmujen (positioiden) minimoiminen. Lisäksi laudan tilanteen evaluointialgoritmiä tulee kehittää antamaan realistisempi arvio pelin tilasta.
 
 ## Lähteet
 

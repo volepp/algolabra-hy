@@ -182,19 +182,38 @@ class Position:
                 return False
             return True
 
+        # Whether to recalculate the controlled squares of all enemy pieces
+        # instead of just the ones checking the king when "simulating" the
+        # move in the end of this function.
+        evaluate_all_opponent_pieces = False
         # Color currently in check. Check if move evades check
         if moved_piece.is_king():
             # Make sure moves away from check
-            if op_controlled_squares[tuple(move.to_square)]:
+            # If the potential square is controlled by an opponent piece
+            # it is still possible that the king takes the piece controlling it.
+            # In this case it is possible that the move doesn't lead to a check
+            # but has to be analyzed further to make sure that no other piece
+            # is controlling the square (i.e. protecting the piece).
+            # So here the idea is just that if the king doesn't capture anything
+            # and the square it's trying to move to is controlled by the opponent, 
+            # the move will lead to check.
+            if captured_piece is None and op_controlled_squares[tuple(move.to_square)]:
                 return True
+            # This also means that we have to recalculate the squares all the
+            # opponent pieces control instead of just the checking pieces.
+            evaluate_all_opponent_pieces = True
         else:
             # If not moving the king and not pinned. The move
             # cannot lead to check if not in check already.
             if not self.is_color_in_check(moved_piece.color):
                 return False
-            
-            # If not moving the king, cannot block 2 checks at once
-            if len(own_king.attacked_by) > 1:
+
+            # If captures the only checking piece, the check is removed
+            if len(own_king.attacked_by) == 1:
+                if own_king.attacked_by[0] == captured_piece:
+                    return False
+            else: # Is in check by more than one piece:
+                # If not moving the king, cannot block 2 checks at once
                 return True
         
         # Check if blocks check by making the move and 
@@ -207,9 +226,14 @@ class Position:
         if moved_piece.is_king():
             own_king_sqr = move.to_square
         result_pos = self.make_move(move)
-        checking_piece_sqrs = [piece.square for piece in own_king.attacked_by]
-        for sqr in checking_piece_sqrs:
-            piece = result_pos.position[tuple(sqr)]
+        if evaluate_all_opponent_pieces:
+            pieces_to_evaluate = [result_pos.position[tuple(piece.square)] \
+                for (_, _), piece in np.ndenumerate(self.position) \
+                    if piece is not None and piece.color != moved_piece.color]
+        else:
+            pieces_to_evaluate = [result_pos.position[tuple(piece.square)] for piece in own_king.attacked_by]
+        for piece in pieces_to_evaluate:
+            # The board is deep copied so this doesn't affect the main board pieces.
             piece.calculate_controlled_squares(result_pos.position)
             piece_controlled_squares = piece.get_controlled_squares()
             if own_king_sqr.tolist() in piece_controlled_squares.tolist():
@@ -320,7 +344,10 @@ class Board:
         self.position_history.append(copy.deepcopy(self.position))
         self.position = self.position.make_move(move)
         self.position.process()
-        
+
+        if len(self.moves) > 0 and self.moves[0] == Move.parse_uci("d2a5"):
+            print(self.moves)
+
         self.update_game_result()
         return self.result, True
 

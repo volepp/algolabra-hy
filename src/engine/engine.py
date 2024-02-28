@@ -58,6 +58,7 @@ class Engine:
                     best_move_eval = eval
                     best_move = move
                     if eval == math.inf:
+                        print("CHECKMATE", abs(best_move_eval))
                         # Stop after finding the first checkmate
                         break
                     alpha = best_move_eval
@@ -69,14 +70,11 @@ class Engine:
                         break
                     beta = best_move_eval
 
-            if abs(best_move_eval) == math.inf:
-                break # Checkmate found
-
             self.move_memory[board_fen] = best_move
             legal_moves = self.sort_best_move_first(board, legal_moves)
 
             time_elapsed = time.time()-start_time
-            if time_elapsed > max_time_per_iteration_secs:
+            if time_elapsed > max_time_per_iteration_secs or abs(best_move_eval) == math.inf:
                 print(f"Evaluation: {best_move_eval}, depth: {current_depth}, time: {time.time()-start_of_search_ts} seconds")
                 return (best_move, best_move_eval)
 
@@ -127,12 +125,9 @@ class Engine:
             for nmove in legal_moves:
                 eval, nnodes = self.minmax_ab_eval_move(board, depth-1, nmove, alpha=alpha, beta=beta)
                 nr_nodes_visited += nnodes
-                if eval > best_eval:
-                    best_eval = eval
-                    alpha = max(alpha, best_eval)
+                best_eval = max(best_eval, eval)
+                alpha = max(alpha, best_eval)
 
-                if best_eval == math.inf:
-                    break # Checkmate found
                 if best_eval > beta:
                     break
             board.undo_last_move()
@@ -142,12 +137,9 @@ class Engine:
             for nmove in legal_moves:
                 eval, nnodes = self.minmax_ab_eval_move(board, depth-1, nmove, alpha=alpha, beta=beta)
                 nr_nodes_visited += nnodes
-                if eval < best_eval:
-                    best_eval = eval
-                    beta = min(beta, best_eval)
+                best_eval = min(best_eval, eval)
+                beta = min(beta, best_eval)
 
-                if best_eval == -math.inf:
-                    break # Checkmate found
                 if best_eval < alpha:
                     break
             board.undo_last_move()
@@ -179,6 +171,7 @@ class Engine:
         piece_control_score_loss = position.get_piece_control_score(moved_piece)
         moved_piece.square = move.to_square
         moved_piece.calculate_controlled_squares(position.position)
+
         piece_control_score_gain = position.get_piece_control_score(moved_piece)
 
         if moved_piece.color == Color.White:
@@ -189,7 +182,7 @@ class Engine:
         # Move piece back
         moved_piece.square = original_square
         moved_piece.calculate_controlled_squares(position.position)
-
+        
         # If the moved piece can be captured after the move, we have to remove it's value from
         # the evaluation just to be safe. Otherwise, with odd depth (e.g. 3), we can run into situations
         # where the AI captures a piece in the end without realizing that the opponent can capture it
@@ -205,11 +198,11 @@ class Engine:
         # and take the material loss into account.
         # Here the move is assumed to be legal.
 
-        if position[tuple(move.to_square)] is None:
+        captured_piece = position[tuple(move.to_square)]
+        if captured_piece is None:
             # No captured piece
             return eval
 
-        captured_piece = position[tuple(move.to_square)]
         # First, update the material count
         if captured_piece.color == Color.White:
             eval -= captured_piece.value
