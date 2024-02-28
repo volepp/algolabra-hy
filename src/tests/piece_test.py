@@ -115,3 +115,24 @@ class TestPieces(unittest.TestCase):
         self.assertEqual(len(bp.get_controlled_squares()), 2)
         self.assertEqual(len(wp.get_movable_squares()), 2) # Forward and capture
         self.assertEqual(len(bp.get_movable_squares()), 2) # Forward and capture
+
+    def test_calculate_linear_squares(self):
+        piece = Piece(np.array([0,0], dtype=int), Color.White, 0)
+
+        # Check that should have no linear squares in any direction (blocked in the corner by the other pieces)
+        # calculate_linear_squares 
+        possible_directions = np.array(np.meshgrid([-1,0,1], [-1,0,1])).T.reshape(-1, 2)
+        nr_controlled_squares = 0
+        for dir in possible_directions:
+            if dir[0] == 0 and dir[1] == 0: continue
+            nr_controlled_squares += len(piece.calculate_linear_squares(self.board.position.position, dir, dry_run=True))
+        
+        self.assertEqual(3, nr_controlled_squares) # Should control the squares in directions (1,0), (1,1), (0,1)
+
+        piece.square = np.array([3,3], dtype=int)
+        nr_controlled_squares = 0
+        for dir in possible_directions:
+            if dir[0] == 0 and dir[1] == 0: continue
+            nr_controlled_squares += len(piece.calculate_linear_squares(self.board.position.position, dir, dry_run=False))
+
+        self.assertEqual(22, nr_controlled_squares)

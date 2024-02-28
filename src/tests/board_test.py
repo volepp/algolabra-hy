@@ -27,6 +27,15 @@ class TestBoard(unittest.TestCase):
         self.assertIn(Move.parse_uci("e7e5"), self.board.moves)
         self.assertIn(Move.parse_uci("g1f3"), self.board.moves)
 
+        # Make sure updating one move works
+        moves = "e2e4 e7e6 g1f3"
+        self.board.update_moves(moves)
+        print(self.board.moves)
+        self.assertEqual(len(self.board.moves), 3)
+        self.assertIn(Move.parse_uci("e2e4"), self.board.moves)
+        self.assertIn(Move.parse_uci("e7e6"), self.board.moves)
+        self.assertIn(Move.parse_uci("g1f3"), self.board.moves)
+
         # Test that resets game with empty input
         self.board.update_moves("")
         self.assertEqual(len(self.board.moves), 0)
@@ -105,7 +114,12 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(self.board.position[5, 5], Knight(None, Color.Black))
         self.assertEqual(self.board.position[5, 1], Rook(None, Color.Black))
 
-    def test_fen_output(self):
+    def test_board_fen_output(self):
         fen = "6k1/3b4/1rR2n2/5N2/2pB2Q1/4q1P1/1K6/8"
         self.board.load_board_fen(fen)
         self.assertEqual(self.board.board_fen(), fen)
+
+    def test_fen_output(self):
+        fen = "6k1/3b4/1rR2n2/5N2/2pB2Q1/4q1P1/1K6/8"
+        self.board.load_board_fen(fen)
+        self.assertEqual(self.board.fen(), fen+" w")

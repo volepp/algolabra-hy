@@ -325,7 +325,8 @@ class Board:
                     continue # Move already played
                 # Some other move played instead than what's in memory.
                 # Undo all moves after the last verified move (that can be found in movestr)
-                self.moves = self.moves[:i]
+                while len(self.moves) > i:
+                    self.undo_last_move()
             self.play_move(Move.parse_uci(mstr))
 
     def play_move(self, move: Move, check_legality=True):
@@ -364,14 +365,6 @@ class Board:
             return
 
         self.result = None
-
-    def get_pieces_for_color(self, color: Color):
-        pieces = []
-        for (_, _), piece in np.ndenumerate(self.position):
-            if piece is not None and piece.color == color:
-                pieces.append(piece)
-        
-        return pieces
 
     def undo_last_move(self):
         self.moves = self.moves[:-1]

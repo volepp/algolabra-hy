@@ -238,17 +238,3 @@ class Engine:
         moves = [moves[i] for i in sorted_indices]
         # Sort by score. Highest score first
         return moves
-
-    def score_move_potential(self, board: np.array, move):
-        """ Scores the move by how interesting it is. 
-        Captures are given higher values than
-        other moves.
-        """
-        moved_piece = board.position[tuple(move.from_square)]
-        captured_piece = board.position[tuple(move.to_square)]
-        if captured_piece is None:
-            return 0
-        elif captured_piece.color == moved_piece.color:
-            return 0
-        
-        return 1
