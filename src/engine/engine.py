@@ -58,7 +58,6 @@ class Engine:
                     best_move_eval = eval
                     best_move = move
                     if eval == math.inf:
-                        print("CHECKMATE", abs(best_move_eval))
                         # Stop after finding the first checkmate
                         break
                     alpha = best_move_eval
